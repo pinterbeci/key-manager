@@ -1,6 +1,7 @@
 package reader;
 
 import manager.KeyManager;
+import validation.LineValidator;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,6 +9,9 @@ import java.io.InputStreamReader;
 
 public class ReadClientCommands {
 
+    private ReadClientCommands(){
+        throw new IllegalStateException("Utility class");
+    }
     public static void readCommands() throws IOException {
         KeyManager keyManager = new KeyManager();
 
@@ -21,14 +25,18 @@ public class ReadClientCommands {
         do {
             readedLine = bufferedReader.readLine();
 
-            if ("KeyManager.getKey()".equals(readedLine)) {
-                System.out.println("get this key = " + keyManager.getKey());
-            }
-            if ((readedLine).contains("KeyManager.releaseKey")) {
+            if (LineValidator.isValidReadedLine(readedLine)) {
+                if ("KeyManager.getKey()".equals(readedLine)) {
+                    System.out.println("get this key = " + keyManager.getKey());
+                }
 
-                int releaseThisKey =  Integer.parseInt(readedLine.replaceAll("[\\D]", ""));
-                System.out.println("released this key = " + releaseThisKey);
-                System.out.println("release is succesed = " + keyManager.releaseKey(releaseThisKey));
+                if ((readedLine).startsWith("KeyManager.releaseKey(")) {
+                    int releaseThisKey = Integer.parseInt(readedLine.replaceAll("[\\D]", ""));
+                    System.out.println("released this key = " + releaseThisKey);
+                    System.out.println("release is succesed = " + keyManager.releaseKey(releaseThisKey));
+                }
+            } else {
+                System.out.println("Wrong command!");
             }
 
         } while (!readedLine.equals("Done!"));
